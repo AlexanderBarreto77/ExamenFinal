@@ -48,3 +48,10 @@ optimización-portafolio/
 │
 │── README.md
 │── pom.xml                 # Configuración Maven
+
+## Configuración del Backend
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/usuario/optimizacion-portafolio.git
+cd optimizacion-portafolio/backend
