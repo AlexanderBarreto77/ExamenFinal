@@ -55,3 +55,73 @@ optimización-portafolio/
 ```bash
 git clone https://github.com/usuario/optimizacion-portafolio.git
 cd optimizacion-portafolio/backend
+Compila y ejecuta el servidor:
+
+mvn spring-boot:run
+
+
+El backend quedará disponible en:
+
+http://localhost:8080
+
+
+Endpoint principal:
+
+POST /api/optimizar
+
+
+Ejemplo de request JSON:
+
+{
+  "capacidad": 10000,
+  "objetos": [
+    { "nombre": "Fondo_A", "peso": 2000, "ganancia": 1500 },
+    { "nombre": "Fondo_B", "peso": 4000, "ganancia": 3500 }
+  ]
+}
+
+
+Ejemplo de response JSON:
+
+{
+  "gananciaTotal": 5000,
+  "pesoTotal": 6000,
+  "seleccionados": ["Fondo_A", "Fondo_B"]
+}
+
+Frontend
+
+Abre el archivo:
+
+cd frontend
+open index.html
+
+
+o simplemente ábrelo en tu navegador.
+
+La aplicación permite:
+
+Ingresar presupuesto total
+
+Añadir múltiples proyectos (costo y ganancia)
+
+Calcular la combinación óptima
+
+Ver resultados en:
+
+Tarjetas resumen (ganancia total, inversión utilizada, eficiencia)
+
+Tabla de proyectos seleccionados
+
+Gráfico comparativo (Chart.js)
+
+
+Información Académica
+
+Universidad de las Fuerzas Armadas ESPE
+
+Carrera: Ingeniería en Tecnologías de la Información – Modalidad En Línea
+
+Asignatura: Arquitectura de Software
+
+Docente: Ing. Geovanny Cudco
