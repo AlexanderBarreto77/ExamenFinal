@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimización de Portafolio de Inversiones - ESPE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        .input-focus:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<!-- Header -->
+<header class="gradient-bg text-white py-8">
+    <div class="container mx-auto px-4 text-center">
+        <img src="https://srvcas.espe.edu.ec/authenticationendpoint/images/Espe-Angular-Logo.png"
+             alt="Escudo de la Universidad de las Fuerzas Armadas ESPE"
+             class="mx-auto mb-6 w-48 h-48 object-contain">
+        <h1 class="text-4xl font-bold mb-2">Universidad de las Fuerzas Armadas ESPE</h1>
+        <p class="text-xl opacity-90">Optimización de Portafolio de Inversiones</p>
+        <p class="text-sm opacity-75 mt-2">Departamento de Ciencias de la Computación - Arquitectura de Software</p>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Input Section -->
+        <div class="bg-white rounded-xl card-shadow p-6 animate-fade-in">
+            <div class="flex items-center mb-6">
+                <i class="fas fa-chart-line text-2xl text-indigo-600 mr-3"></i>
+                <h2 class="text-2xl font-bold text-gray-800">Configuración de Inversión</h2>
+            </div>
+
+            <!-- Capacidad Input -->
+            <div class="mb-6">
+                <label for="capacidad" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-dollar-sign mr-2"></i>Presupuesto Total (USD)
+                </label>
+                <input type="number"
+                       id="capacidad"
+                       placeholder="Ej: 10000"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            </div>
+
+            <!-- Projects Section -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <label class="block text-sm font-medium text-gray-700">
+                        <i class="fas fa-briefcase mr-2"></i>Proyectos de Inversión
+                    </label>
+                    <button onclick="agregarProyecto()"
+                            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Agregar Proyecto
+                    </button>
+                </div>
+
+                <div id="proyectos" class="space-y-4">
+                    <!-- Los proyectos se agregarán dinámicamente aquí -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3">
+                <button onclick="calcular()"
+                        class="btn-primary text-white px-6 py-3 rounded-lg font-medium flex-1 min-w-0">
+                    <i class="fas fa-calculator mr-2"></i>Calcular Óptimo
+                </button>
+                <button onclick="limpiarFormulario()"
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    <i class="fas fa-eraser mr-2"></i>Limpiar
+                </button>
+                <button onclick="cargarEjemplo()"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    <i class="fas fa-lightbulb mr-2"></i>Ejemplo
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-white rounded-xl card-shadow p-6 animate-fade-in">
+            <div class="flex items-center mb-6">
+                <i class="fas fa-trophy text-2xl text-yellow-600 mr-3"></i>
+                <h2 class="text-2xl font-bold text-gray-800">Resultados de Optimización</h2>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="hidden text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
+                <p class="text-gray-600">Calculando la combinación óptima...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                    <span class="text-red-700 font-medium">Error:</span>
+                </div>
+                <p id="error-message" class="text-red-600 mt-1"></p>
+            </div>
+
+            <!-- Results Display -->
+            <div id="resultados" class="hidden">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gradient-to-r from-green-400 to-green-600 text-white p-4 rounded-lg text-center">
+                        <i class="fas fa-coins text-2xl mb-2"></i>
+                        <p class="text-sm opacity-90">Ganancia Total</p>
+                        <p id="ganancia-total" class="text-2xl font-bold">$0</p>
+                    </div>
+                    <div class="bg-gradient-to-r from-blue-400 to-blue-600 text-white p-4 rounded-lg text-center">
+                        <i class="fas fa-wallet text-2xl mb-2"></i>
+                        <p class="text-sm opacity-90">Inversión Utilizada</p>
+                        <p id="peso-total" class="text-2xl font-bold">$0</p>
+                    </div>
+                    <div class="bg-gradient-to-r from-purple-400 to-purple-600 text-white p-4 rounded-lg text-center">
+                        <i class="fas fa-percentage text-2xl mb-2"></i>
+                        <p class="text-sm opacity-90">Eficiencia</p>
+                        <p id="eficiencia" class="text-2xl font-bold">0%</p>
+                    </div>
+                </div>
+
+                <!-- Selected Projects Table -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        Proyectos Seleccionados
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 px-3 font-medium text-gray-700">Proyecto</th>
+                                <th class="text-right py-2 px-3 font-medium text-gray-700">Costo</th>
+                                <th class="text-right py-2 px-3 font-medium text-gray-700">Ganancia</th>
+                                <th class="text-right py-2 px-3 font-medium text-gray-700">ROI</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tabla-seleccionados">
+                            <!-- Los proyectos seleccionados se mostrarán aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fas fa-chart-bar text-blue-500 mr-2"></i>
+                        Análisis Comparativo
+                    </h3>
+                    <canvas id="grafico-comparativo" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center py-12">
+                <img src="https://placehold.co/200x150" alt="Ilustración de gráficos financieros con tendencias ascendentes y monedas doradas representando crecimiento de inversiones" class="mx-auto mb-4 opacity-50">
+                <p class="text-gray-500 text-lg mb-2">Configura tu portafolio de inversiones</p>
+                <p class="text-gray-400">Ingresa tu presupuesto y proyectos para obtener la combinación óptima</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-white py-6 mt-12">
+    <div class="container mx-auto px-4 text-center">
+        <p class="mb-2">Universidad de las Fuerzas Armadas ESPE</p>
+        <p class="text-sm text-gray-400">Carrera de Ingeniería en Tecnologías de la Información - En Línea</p>
+        <p class="text-sm text-gray-400">Docente: Geovanny Cudco | Examen Final - Arquitectura de Software</p>
+    </div>
+</footer>
+
+<script>
+    let proyectoCounter = 0;
+    let chartInstance = null;
+
+    // Agregar un nuevo proyecto al formulario
+    function agregarProyecto() {
+        proyectoCounter++;
+        const proyectosContainer = document.getElementById('proyectos');
+        const proyectoDiv = document.createElement('div');
+        proyectoDiv.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 proyecto-item animate-fade-in';
+        proyectoDiv.innerHTML = `
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="font-medium text-gray-700">
+                    <i class="fas fa-project-diagram mr-2"></i>Proyecto ${proyectoCounter}
+                </h4>
+                <button onclick="eliminarProyecto(this)"
+                        class="text-red-500 hover:text-red-700 transition-colors">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Nombre</label>
+                    <input type="text"
+                           placeholder="Ej: Fondo_A"
+                           class="w-full px-3 py-2 border border-gray-300 rounded input-focus focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                           required>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Costo (USD)</label>
+                    <input type="number"
+                           placeholder="2000"
+                           min="0"
+                           class="w-full px-3 py-2 border border-gray-300 rounded input-focus focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                           required>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Ganancia (USD)</label>
+                    <input type="number"
+                           placeholder="1500"
+                           min="0"
+                           class="w-full px-3 py-2 border border-gray-300 rounded input-focus focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                           required>
+                </div>
+            </div>
+        `;
+        proyectosContainer.appendChild(proyectoDiv);
+    }
+
+    // Eliminar un proyecto
+    function eliminarProyecto(button) {
+        const proyectoDiv = button.closest('.proyecto-item');
+        proyectoDiv.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => {
+            proyectoDiv.remove();
+        }, 300);
+    }
+
+    // Limpiar formulario
+    function limpiarFormulario() {
+        document.getElementById('capacidad').value = '';
+        document.getElementById('proyectos').innerHTML = '';
+        proyectoCounter = 0;
+        ocultarResultados();
+    }
+
+    // Cargar ejemplo de datos
+    function cargarEjemplo() {
+        document.getElementById('capacidad').value = '10000';
+        limpiarProyectos();
+
+        const ejemplos = [
+            { nombre: 'Fondo_A', peso: 2000, ganancia: 1500 },
+            { nombre: 'Fondo_B', peso: 4000, ganancia: 3500 },
+            { nombre: 'Fondo_C', peso: 5000, ganancia: 4000 },
+            { nombre: 'Fondo_D', peso: 3000, ganancia: 2500 },
+            { nombre: 'Fondo_E', peso: 1500, ganancia: 1800 }
+        ];
+
+        ejemplos.forEach(proyecto => {
+            agregarProyecto();
+            const proyectoDiv = document.querySelector('.proyecto-item:last-child');
+            const inputs = proyectoDiv.querySelectorAll('input');
+            inputs[0].value = proyecto.nombre;
+            inputs[1].value = proyecto.peso;
+            inputs[2].value = proyecto.ganancia;
+        });
+    }
+
+    function limpiarProyectos() {
+        document.getElementById('proyectos').innerHTML = '';
+        proyectoCounter = 0;
+    }
+
+    // Recopilar datos del formulario
+    function recopilarDatos() {
+        const capacidad = parseInt(document.getElementById('capacidad').value);
+        const proyectosElements = document.querySelectorAll('.proyecto-item');
+
+        if (isNaN(capacidad) || capacidad <= 0) {
+            throw new Error('Por favor ingrese una capacidad válida mayor a 0');
+        }
+
+        if (proyectosElements.length === 0) {
+            throw new Error('Debe agregar al menos un proyecto');
+        }
+
+        const objetos = [];
+        for (const proyectoElement of proyectosElements) {
+            const inputs = proyectoElement.querySelectorAll('input');
+            const nombre = inputs[0].value.trim();
+            const peso = parseInt(inputs[1].value);
+            const ganancia = parseInt(inputs[2].value);
+
+            if (!nombre) {
+                throw new Error('Todos los proyectos deben tener un nombre');
+            }
+            if (isNaN(peso) || peso <= 0) {
+                throw new Error(`El costo del proyecto "${nombre}" debe ser un número positivo`);
+            }
+            if (isNaN(ganancia) || ganancia <= 0) {
+                throw new Error(`La ganancia del proyecto "${nombre}" debe ser un número positivo`);
+            }
+
+            objetos.push({ nombre, peso, ganancia });
+        }
+
+        return { capacidad, objetos };
+    }
+
+    // Mostrar estado de carga
+    function mostrarCarga() {
+        document.getElementById('loading').classList.remove('hidden');
+        document.getElementById('error').classList.add('hidden');
+        document.getElementById('resultados').classList.add('hidden');
+        document.getElementById('empty-state').classList.add('hidden');
+    }
+
+    // Mostrar error
+    function mostrarError(mensaje) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+        document.getElementById('resultados').classList.add('hidden');
+        document.getElementById('empty-state').classList.add('hidden');
+        document.getElementById('error-message').textContent = mensaje;
+    }
+
+    // Ocultar resultados
+    function ocultarResultados() {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.add('hidden');
+        document.getElementById('resultados').classList.add('hidden');
+        document.getElementById('empty-state').classList.remove('hidden');
+        if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+    }
+
+    // Mostrar resultados
+    function mostrarResultados(data, todosLosProyectos) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.add('hidden');
+        document.getElementById('resultados').classList.remove('hidden');
+        document.getElementById('empty-state').classList.add('hidden');
+
+        // Actualizar tarjetas de resumen
+        document.getElementById('ganancia-total').textContent = `$${data.gananciaTotal.toLocaleString()}`;
+        document.getElementById('peso-total').textContent = `$${data.pesoTotal.toLocaleString()}`;
+
+        const capacidad = parseInt(document.getElementById('capacidad').value);
+        const eficiencia = Math.round((data.pesoTotal / capacidad) * 100);
+        document.getElementById('eficiencia').textContent = `${eficiencia}%`;
+
+        // Mostrar tabla de proyectos seleccionados
+        const tablaBody = document.getElementById('tabla-seleccionados');
+        tablaBody.innerHTML = '';
+
+        data.seleccionados.forEach(nombreProyecto => {
+            const proyecto = todosLosProyectos.find(p => p.nombre === nombreProyecto);
+            if (proyecto) {
+                const roi = Math.round((proyecto.ganancia / proyecto.peso) * 100);
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-100';
+                row.innerHTML = `
+                    <td class="py-2 px-3 text-gray-800">${proyecto.nombre}</td>
+                    <td class="py-2 px-3 text-right text-gray-800">$${proyecto.peso.toLocaleString()}</td>
+                    <td class="py-2 px-3 text-right text-green-600 font-medium">$${proyecto.ganancia.toLocaleString()}</td>
+                    <td class="py-2 px-3 text-right text-blue-600 font-medium">${roi}%</td>
+                `;
+                tablaBody.appendChild(row);
+            }
+        });
+
+        // Crear gráfico comparativo
+        crearGraficoComparativo(todosLosProyectos, data.seleccionados);
+    }
+
+    // Crear gráfico comparativo
+    function crearGraficoComparativo(todosLosProyectos, seleccionados) {
+        const ctx = document.getElementById('grafico-comparativo').getContext('2d');
+
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        const labels = todosLosProyectos.map(p => p.nombre);
+        const ganancias = todosLosProyectos.map(p => p.ganancia);
+        const costos = todosLosProyectos.map(p => p.peso);
+        const colores = todosLosProyectos.map(p =>
+            seleccionados.includes(p.nombre) ? '#10B981' : '#E5E7EB'
+        );
+
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Ganancia',
+                        data: ganancias,
+                        backgroundColor: colores,
+                        borderColor: colores.map(color => color === '#10B981' ? '#059669' : '#D1D5DB'),
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    bar: {
+                        borderRadius: 4
+                    }
+                }
+            }
+        });
+    }
+
+    // Función principal de cálculo
+    async function calcular() {
+        try {
+            mostrarCarga();
+
+            const datos = recopilarDatos();
+
+            const response = await fetch('http://localhost:8080/api/optimizar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datos)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `Error del servidor: ${response.status}`);
+            }
+
+            const resultado = await response.json();
+            mostrarResultados(resultado, datos.objetos);
+
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarError(error.message);
+        }
+    }
+
+    // Inicializar con ejemplo al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar algunos proyectos de ejemplo por defecto
+        agregarProyecto();
+    });
+
+    // Agregar CSS para la animación de fadeOut
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+</body>
+</html>
+
