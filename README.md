@@ -1,8 +1,8 @@
 # Optimización de Portafolio de Inversiones - ESPE
 
-Este proyecto implementa una aplicación web para la **optimización de portafolios de inversión**, desarrollada en el marco de la asignatura **Arquitectura de Software** de la **Universidad de las Fuerzas Armadas ESPE**.  
+Este proyecto implementa una aplicación web para la optimización de portafolios de inversión**, desarrollada en el marco de la asignatura Arquitectura de Software de la Universidad de las Fuerzas Armadas ESPE.  
 
-Permite ingresar un presupuesto y un conjunto de proyectos de inversión, y mediante un algoritmo de optimización (implementado en el backend con **Spring Boot**) se calcula la combinación óptima de proyectos que maximiza la ganancia total.  
+Permite ingresar un presupuesto y un conjunto de proyectos de inversión, y mediante un algoritmo de optimización (implementado en el backend con Spring Boot) se calcula la combinación óptima de proyectos que maximiza la ganancia total.  
 
 El frontend está construido con **HTML, TailwindCSS, FontAwesome y Chart.js**, proporcionando una interfaz intuitiva, interactiva y con visualizaciones dinámicas.  
 
