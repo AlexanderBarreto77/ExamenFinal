@@ -51,11 +51,11 @@ optimización-portafolio/
 
 ---
 ## Configuración del Backend
-### 1. Clonar el repositorio
+### 1. Clonamos el repositorio
 ```bash
 git clone https://github.com/usuario/optimizacion-portafolio.git
 cd optimizacion-portafolio/backend
-Compila y ejecuta el servidor:
+Compilamos y ejecutamos el servidor:
 
 mvn spring-boot:run
 
@@ -91,13 +91,13 @@ Ejemplo de response JSON:
 
 Frontend
 
-Abre el archivo:
+Abrimos el archivo:
 
 cd frontend
 open index.html
 
 
-o simplemente ábrelo en tu navegador.
+o simplemente lo abrimos en nuestro navegador.
 
 La aplicación permite:
 
